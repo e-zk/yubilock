@@ -1,0 +1,46 @@
+#!/bin/sh
+# yubilock (c) zakaria wtfpl
+# DESCRIPTION:
+#   yubikey detach script for OpenBSD hotplugd(8).
+#   runs xlock(1) on $DISPLAY as $xuser when a fido device is detached.
+# REQUIREMENTS:
+#   - hotplugd(8) enabled:
+#         $ rcctl enable hotplugd
+#   - $xuser variable in this script is changed to be the
+#     user of the primary X11 session.
+#   - a doas rule allowing root to run xlock as $xuser.
+# INSTALLATION:
+#   - place this script in: /etc/hotplug/detach
+#   - start/reload hotplugd:
+#         $ rcctl start hotplugd # or
+#         $ rcctl reload hotplugd
+
+# user to run xlock command as ((change this))
+xuser=zzz
+# primary X11 display
+DISPLAY=:0
+
+# event = {attach, detach}
+# class = device class [0-5]
+# name  = device name
+event="${0##*/}"
+class="$1"
+name="$2"
+
+# uncomment to log all detach events to syslog
+#logger -t "$event" "${class}:${name}"
+
+# if event is a 'fido' any device being detached...
+if [ "$event" = "detach" ]; then
+	case "$name" in
+		fido[0-9])
+			# log to syslog
+			logger -t "$event" "fido key detached - locking"
+
+			# actually lock display now
+			export DISPLAY
+			doas -u $xuser xlock +description -info "KEY DETACHED" &
+		;;
+	esac
+fi
+
