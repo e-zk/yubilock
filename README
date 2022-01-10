@@ -4,12 +4,18 @@ hotplugd script to lock X when yubikey (or any fido device) is detached.
 
 install/usage
 ==============
-1. add a doas.conf(5) rule to allow root to run xlock as $xuser.
+1. add a doas.conf(5) rule to allow root to run the lock command as $xuser:
+	# alows root to run xlock as xuser
+	permit nopass keepenv root as xuser cmd /usr/X11R6/bin/xlock
+
 2. open the 'detach' script and change $xuser.
    change $DISPLAY, and $lock_cmd if necessary.
+
 3. copy 'detach' to /etc/hotplug/detach
+
 4. set the appropriate permissions:
 	# chmod 750 /etc/hotplug/detach
+
 5. start/reload hotplugd:
 	# rcctl start hotplugd; rcctl reload hotplugd
 
