@@ -18,9 +18,10 @@
 # user to run xlock command as ((change this))
 xuser=zzz
 # lock command to run
-lock_cmd='xlock +description -info "KEY DETACHED"'
+lock_cmd=/usr/X11R6/bin/xlock
+lock_cmd_args="-bg darkred -info DETACHED"
 # primary X11 display
-DISPLAY=:0
+export DISPLAY=:0
 
 # event = {attach, detach}
 # class = device class [0-5]
@@ -32,7 +33,7 @@ name="$2"
 # uncomment to log all detach events to syslog
 #logger -t "$event" "${class}:${name}"
 
-# if event is a 'fido' any device being detached...
+# if event is a 'fido' device being detached...
 if [ "$event" = "detach" ]; then
 	case "$name" in
 		fido[0-9])
@@ -40,8 +41,8 @@ if [ "$event" = "detach" ]; then
 			logger -t "$event" "fido key detached - locking"
 
 			# actually lock display now
-			export DISPLAY
-			doas -u $xuser "$lock_cmd" &
+			export DISPLAY=$DISPLAY
+			doas -n -u "$xuser" "$lock_cmd" ${lock_cmd_args}
 		;;
 	esac
 fi
