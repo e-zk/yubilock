@@ -17,6 +17,8 @@
 
 # user to run xlock command as ((change this))
 xuser=zzz
+# lock command to run
+lock_cmd='xlock +description -info "KEY DETACHED"'
 # primary X11 display
 DISPLAY=:0
 
@@ -39,7 +41,7 @@ if [ "$event" = "detach" ]; then
 
 			# actually lock display now
 			export DISPLAY
-			doas -u $xuser xlock +description -info "KEY DETACHED" &
+			doas -u $xuser "$lock_cmd" &
 		;;
 	esac
 fi
